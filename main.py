@@ -3,10 +3,10 @@ from MangaTranslator.manga_translator import MangaTranslator
 
 # Press the green button in the gutter to run the script.
 if __name__ == '__main__':
-    MANGA_DIR = "/Users/bryan/Downloads/oopsc.jpg"
+    MANGA_DIR = "/Users/bryan/Downloads/oops5.jpg"
     CONFIG = r'--oem 3 --psm 6'
-    LANGUAGE = 'chi_sim'
+    LANGUAGE = 'kor'
+    THRESHOLD = 60
 
-    mange_translator = MangaTranslator(config=CONFIG, language=LANGUAGE)
+    mange_translator = MangaTranslator(config=CONFIG, language=LANGUAGE, threshold=THRESHOLD)
     translated_blocks = mange_translator.translate(MANGA_DIR)
-    print(translated_blocks)

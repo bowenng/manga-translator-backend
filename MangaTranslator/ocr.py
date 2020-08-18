@@ -1,81 +1,81 @@
 import pytesseract
-from PIL import Image
-
+from google.cloud import vision
+import io
 
 class Recognizer:
-    def __init__(self, config=r'--oem 3 --psm 6', language='kor'):
+    def __init__(self, config=r'--oem 3 --psm 6', language='kor', threshold=70):
         self.config = config
         self.language = language
+        self.threshold = threshold
+        self.client = vision.ImageAnnotatorClient()
 
-    def perform_ocr(self, image):
-        data = pytesseract.image_to_data(image,
-                                         config=self.config,
-                                         lang=self.language,
-                                         output_type=pytesseract.Output.DICT)
-        return Blocks(data)
 
-    def process(self, blocks):
-        # filter out low confidence blocks
-        blocks.filter_invalidate_blocks()
-        # combine words of the same block and the same line together
-        blocks.sort_and_combine_words()
-        return blocks
+    def perform_ocr(self, image_path):
+        """Detects text in the file."""
+        with io.open(image_path, 'rb') as image_file:
+            content = image_file.read()
 
+        image = vision.types.Image(content=content)
+
+        response = self.client.text_detection(image=image)
+
+        if response.error.message:
+            raise Exception(
+                '{}\nFor more info on error messages, check: '
+                'https://cloud.google.com/apis/design/errors'.format(
+                    response.error.message))
+
+        return Blocks.from_ocr_annotations(response.full_text_annotation)
 
 class Block:
-    params = ['level', 'block_num', 'line_num', 'word_num', 'top', 'left', 'width', 'height', 'conf', 'text']
 
-    def __init__(self, level, block_num, line_num, word_num, top, left, width, height, conf, text):
-        self.level = level
-        self.block_num = block_num
-        self.line_num = line_num
-        self.word_num = word_num
-        self.top = top
-        self.left = left
-        self.width = width
-        self.height = height
-        self.conf = conf
+    def __init__(self, text, bounding_box, confidence):
         self.text = text
+        self.bounding_box = bounding_box
+        self.confidence = confidence
 
     def __repr__(self):
-        return f"text: {self.text}, block: {self.block_num}, line: {self.line_num}, word: {self.word_num}, conf: {self.conf}"
+        return f"text: {self.text} confidence: {self.confidence}"
 
 
 class Blocks:
-    INVALID_CONF = '-1'
 
-    def __init__(self, output_dict):
-        size = len(output_dict['text'])
-        blocks = []
-
-        for i in range(size):
-            params = []
-            for param in Block.params:
-                params.append(output_dict[param][i])
-            blocks.append(Block(*params))
-
+    def __init__(self, blocks):
         self.blocks = blocks
 
-    def filter_invalidate_blocks(self, conf_threshold=71):
-        self.blocks = list(filter(lambda block: block.conf != Blocks.INVALID_CONF and block.conf >= conf_threshold, self.blocks))
+    @staticmethod
+    def from_ocr_annotations(ocr_annotations):
 
-    def sort(self):
-        self.blocks.sort(key=lambda block: (block.block_num, block.line_num, block.word_num))
+        def extract_text(block):
+            text_list = []
+            for paragraph in block.paragraphs:
+                for word in paragraph.words:
+                    for symbol in word.symbols:
+                        text_list.append(symbol.text)
+            return ''.join(text_list)
 
-    def sort_and_combine_words(self):
-        def combine(block_source, block_target):
-            block_source.text += block_target.text
-        self.sort()
-        write_index = 0
-        for read_index in range(1, len(self.blocks)):
-            write_block = self.blocks[write_index]
-            read_block = self.blocks[read_index]
-            if write_block.block_num == read_block.block_num and write_block.line_num == read_block.line_num:
-                combine(write_block, read_block)
-            else:
-                write_index += 1
-                self.blocks[write_index] = read_block
-        self.blocks = self.blocks[:write_index+1]
+        blocks = []
+
+        for page in ocr_annotations.pages:
+            for block in page.blocks:
+                text = extract_text(block)
+                bounding_box = block.bounding_box
+                confidence = block.confidence
+                blocks.append(Block(text, bounding_box, confidence))
+
+        return Blocks(blocks)
+
+    def translated(self, translations):
+        blocks = []
+        for i in range(len(translations)):
+            text = translations[i]
+            bounding_box = self.blocks[i].bounding_box
+            confidence = self.blocks[i].confidence
+            blocks.append(Block(text, bounding_box, confidence))
+        return Blocks(blocks)
+
+    def text_list(self):
+        return [block.text for block in self.blocks]
 
     def __repr__(self):
         description = '[\n'

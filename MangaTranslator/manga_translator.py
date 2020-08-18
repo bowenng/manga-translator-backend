@@ -1,17 +1,17 @@
 from MangaTranslator.translator import Translator
 from MangaTranslator.image_processor import ImageProcessor
 from MangaTranslator.ocr import Recognizer
+import cv2
 
 
 class MangaTranslator:
-    def __init__(self, config=r'--oem 3 --psm 6', language='kor'):
+    def __init__(self, config=r'--oem 3 --psm 6', language='kor', threshold=71):
         self.translator = Translator()
         self.image_processor = ImageProcessor()
-        self.recognizer = Recognizer(config=config, language=language)
+        self.recognizer = Recognizer(config=config, language=language, threshold=threshold)
 
     def translate(self, manga_uri):
-        manga = self.image_processor.start_processing_image(manga_uri).get_grayscale().finish()
-        blocks = self.recognizer.perform_ocr(manga)
-        self.recognizer.process(blocks)
-        translated_blocks = self.translator.translate_blocks(blocks)
+        ocr_blocks = self.recognizer.perform_ocr(manga_uri)
+        translations = self.translator.translate(ocr_blocks.text_list())
+        translated_blocks = ocr_blocks.translated(translations)
         print(translated_blocks)
