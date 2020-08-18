@@ -11,6 +11,7 @@ class Translator:
             return result['translatedText']
 
     def translate_blocks(self, blocks, target_language='eng'):
+        # TODO: Deep copy
         for block in blocks.blocks:
             block.text = self.translate(block.text, target_language=target_language)
         return blocks

@@ -21,8 +21,10 @@ class Recognizer:
         blocks.sort_and_combine_words()
         return blocks
 
+
 class Block:
     params = ['level', 'block_num', 'line_num', 'word_num', 'top', 'left', 'width', 'height', 'conf', 'text']
+
     def __init__(self, level, block_num, line_num, word_num, top, left, width, height, conf, text):
         self.level = level
         self.block_num = block_num
