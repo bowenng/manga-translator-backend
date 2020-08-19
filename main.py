@@ -14,16 +14,16 @@ def translate_image(request):
     """
 
     image = request.data
-    return str(type(request.data))
+
     if image:
         translator = MangaTranslator()
         translated_manga = translator.translate(image)
 
-        response = flask.make_response((translated_manga, '200', {'Content-Type' : 'image/png'}))
+        response = flask.make_response((translated_manga, 200, {'Content-Type' : 'image/png'}))
 
         return response
     else:
-        return flask.make_response(('Invalid Argument', '406'))
+        return flask.make_response(('Invalid Argument', 406))
 
 
 if __name__ == '__main__':
