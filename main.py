@@ -14,7 +14,7 @@ def translate_image(request):
        `make_response <http://flask.pocoo.org/docs/1.0/api/#flask.Flask.make_response>`.
     """
 
-    image = request.data
+    image = request.files['manga']
 
     if image:
         translator = MangaTranslator()
