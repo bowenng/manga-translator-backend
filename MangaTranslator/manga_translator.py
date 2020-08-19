@@ -1,8 +1,11 @@
 from MangaTranslator.translator import Translator
 from MangaTranslator.image_processor import ImageProcessor
 from MangaTranslator.ocr import Recognizer
-import textwrap
+
 import cv2
+import numpy as np
+import textwrap
+
 
 
 class MangaTranslator:
@@ -21,15 +24,23 @@ class MangaTranslator:
 
         self.text_background = (255, 255, 255)
 
-    def translate(self, manga_uri):
-        ocr_blocks = self.recognizer.perform_ocr(manga_uri)
+    def translate(self, manga_blob):
+        ocr_blocks = self.recognizer.perform_ocr(manga_blob)
         translations = self.translator.translate(ocr_blocks.text_list())
         translated_blocks = ocr_blocks.translated(translations)
 
-        manga = cv2.imread(manga_uri)
+        manga = self.read_image_from_blob(manga_blob)
+
         manga = self.remove_text(manga, translated_blocks)
         manga = self.write_text(manga, translated_blocks)
-        cv2.imwrite("manga.jpg", manga)
+
+        return cv2.imencode('.png', manga)
+
+    def read_image_from_blob(self, blob):
+        # convert string data to numpy array
+        npimg = np.fromstring(blob, np.uint8)
+        # convert numpy array to image
+        return cv2.imdecode(npimg, cv2.IMREAD_COLOR)
 
     def remove_text(self, image, blocks):
         for block in blocks:
@@ -56,7 +67,6 @@ class MangaTranslator:
                                     self.text_color,
                                     self.font_thickness,
                                     cv2.LINE_AA)
-
 
         return image
 

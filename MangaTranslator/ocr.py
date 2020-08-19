@@ -7,10 +7,8 @@ class Recognizer:
         self.client = vision.ImageAnnotatorClient()
 
 
-    def perform_ocr(self, image_path):
+    def perform_ocr(self, content):
         """Detects text in the file."""
-        with io.open(image_path, 'rb') as image_file:
-            content = image_file.read()
 
         image = vision.types.Image(content=content)
 
