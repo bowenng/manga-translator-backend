@@ -34,7 +34,7 @@ def translate_image(request):
     except Exception:
         logger = logging_client.logger("Manga-Translator")
         stacktrace = traceback.format_exc()
-        logger.log_text(stacktrace)
+        logger.error(stacktrace)
         return flask.make_response(('An error has occurred', 500))
 
 
