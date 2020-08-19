@@ -34,7 +34,11 @@ class MangaTranslator:
         manga = self.remove_text(manga, translated_blocks)
         manga = self.write_text(manga, translated_blocks)
 
-        return cv2.imencode('.png', manga)
+        manga_encoded = cv2.imencode('.png', manga)
+        if manga_encoded[0]:
+            return manga_encoded[1].tobytes()
+        else:
+            raise ValueError("Error while translating manga")
 
     def read_image_from_blob(self, blob):
         # convert string data to numpy array
