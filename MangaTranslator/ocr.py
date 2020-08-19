@@ -1,26 +1,4 @@
 from google.cloud import vision
-import io
-
-
-class Recognizer:
-    def __init__(self):
-        self.client = vision.ImageAnnotatorClient()
-
-
-    def perform_ocr(self, content):
-        """Detects text in the file."""
-
-        image = vision.types.Image(content=content)
-
-        response = self.client.text_detection(image=image)
-
-        if response.error.message:
-            raise Exception(
-                '{}\nFor more info on error messages, check: '
-                'https://cloud.google.com/apis/design/errors'.format(
-                    response.error.message))
-
-        return Blocks.from_ocr_annotations(response.full_text_annotation)
 
 
 class Block:
@@ -83,3 +61,26 @@ class Blocks:
     def __iter__(self):
         return iter(self.blocks)
 
+
+class Recognizer:
+    def __init__(self):
+        self.client = vision.ImageAnnotatorClient()
+
+    def perform_ocr(self, content: bytes) -> Blocks:
+        """ Detects texts in the file
+
+        :param content: bytes representing an image
+        :return: blocks containing texts
+        """
+
+        image = vision.types.Image(content=content)
+
+        response = self.client.text_detection(image=image)
+
+        if response.error.message:
+            raise Exception(
+                '{}\nFor more info on error messages, check: '
+                'https://cloud.google.com/apis/design/errors'.format(
+                    response.error.message))
+
+        return Blocks.from_ocr_annotations(response.full_text_annotation)

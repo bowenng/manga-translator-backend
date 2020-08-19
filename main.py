@@ -3,17 +3,13 @@ from google.cloud import error_reporting
 import base64
 import flask
 import io
-import traceback
 
 
-def translate_image(request):
-    """Responds to any HTTP request.
-    Args:
-       request (flask.Request): HTTP request object.
-    Returns:
-       The response text or any set of values that can be turned into a
-       Response object using
-       `make_response <http://flask.pocoo.org/docs/1.0/api/#flask.Flask.make_response>`.
+def translate_image(request: flask.Request) -> flask.Response:
+    """ Translates a manga
+
+    :param request: flask request object with an image file "manga"
+    :return: flask response with base64 encoded png on success OR error message on failure
     """
 
     error_report_client = error_reporting.Client()
@@ -26,7 +22,6 @@ def translate_image(request):
             translated_manga = translator.translate(image)
             encoded_translated_manga = base64.b64encode(translated_manga)
             response = flask.make_response((encoded_translated_manga, 200, {'Content-Type' : 'image/png'}))
-
             return response
         else:
             return flask.make_response(('Invalid Argument', 406))

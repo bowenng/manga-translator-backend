@@ -1,11 +1,12 @@
 from MangaTranslator.translator import Translator
 from MangaTranslator.image_processor import ImageProcessor
 from MangaTranslator.ocr import Recognizer
+from MangaTranslator.ocr import Blocks
 
 import cv2
 import numpy as np
 import textwrap
-
+from typing import List
 
 
 class MangaTranslator:
@@ -24,7 +25,14 @@ class MangaTranslator:
 
         self.text_background = (255, 255, 255)
 
-    def translate(self, manga_blob):
+    def translate(self,
+                  manga_blob: bytes) -> bytes:
+        """ Translates a manga encoded as bytes
+
+        :param manga_blob: manga to translate
+        :return: translated manga
+        """
+
         ocr_blocks = self.recognizer.perform_ocr(manga_blob)
         translations = self.translator.translate(ocr_blocks.text_list())
         translated_blocks = ocr_blocks.translated(translations)
@@ -40,13 +48,29 @@ class MangaTranslator:
         else:
             raise ValueError("Error while translating manga")
 
-    def read_image_from_blob(self, blob):
+    def read_image_from_blob(self,
+                             blob: bytes) -> np.ndarray:
+        """ Decodes an image
+
+        :param blob: bytes representing an image
+        :return: decoded image as a numpy array
+        """
+
         # convert string data to numpy array
         npimg = np.fromstring(blob, np.uint8)
         # convert numpy array to image
         return cv2.imdecode(npimg, cv2.IMREAD_COLOR)
 
-    def remove_text(self, image, blocks):
+    def remove_text(self,
+                    image: np.ndarray,
+                    blocks: Blocks) -> np.ndarray:
+        """ Remove existing texts from a manga
+
+        :param image: manga containing texts
+        :param blocks: containing bounding boxes of texts
+        :return: manga with texts removed
+        """
+
         # TODO: Use background color
         for block in blocks:
             vertices = block.bounding_box.vertices
@@ -58,7 +82,16 @@ class MangaTranslator:
                                   MangaTranslator.FILL)
         return image
 
-    def write_text(self, image, blocks):
+    def write_text(self,
+                   image: np.ndarray,
+                   blocks: Blocks) -> np.ndarray:
+        """
+
+        :param image: manga without text
+        :param blocks: blocks containing translations and bounding boxes
+        :return: manga with translations
+        """
+
         for block in blocks:
             lines = self.wrap_text(block.text, block.bounding_box)
             origin = (block.bounding_box.vertices[0].x, block.bounding_box.vertices[0].y)
@@ -75,7 +108,9 @@ class MangaTranslator:
 
         return image
 
-    def wrap_text(self, text, bounding_box):
+    def wrap_text(self,
+                  text: str,
+                  bounding_box: Blocks) -> List[str]:
         (char_width, char_height), baseline = cv2.getTextSize(text=self.estimate_character,
                                                               fontFace=self.font_face,
                                                               fontScale=self.font_scale,
@@ -84,12 +119,12 @@ class MangaTranslator:
         max_num_chars = max(width // char_width, 1)
         return textwrap.wrap(text, max_num_chars)
 
-    def get_line_height(self):
+    def get_line_height(self) -> int:
         (char_width, char_height), baseline = cv2.getTextSize(text=self.estimate_character,
                                                               fontFace=self.font_face,
                                                               fontScale=self.font_scale,
                                                               thickness=self.font_thickness)
         return char_height + baseline
 
-    def new_line(self, origin):
+    def new_line(self, origin: (int, int)) -> (int, int):
         return origin[0], origin[1] + self.get_line_height()
