@@ -15,7 +15,7 @@ def translate_image(request):
     """
 
     #image = request.data
-    return str(request)
+    return str(request.data)
     # if image:
     #     translator = MangaTranslator()
     #     translated_manga = translator.translate(image)
