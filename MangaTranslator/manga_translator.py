@@ -8,10 +8,10 @@ import cv2
 class MangaTranslator:
     FILL = -1
 
-    def __init__(self, config=r'--oem 3 --psm 6', language='kor', threshold=71):
+    def __init__(self):
         self.translator = Translator()
         self.image_processor = ImageProcessor()
-        self.recognizer = Recognizer(config=config, language=language, threshold=threshold)
+        self.recognizer = Recognizer()
 
         self.font_face = cv2.FONT_HERSHEY_SIMPLEX
         self.font_scale = 1

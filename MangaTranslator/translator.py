@@ -1,6 +1,7 @@
 from google.cloud import translate_v2 as translate
 import html
 
+
 class Translator:
     def __init__(self):
         self.translate_client = translate.Client()

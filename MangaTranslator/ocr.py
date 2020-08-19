@@ -1,12 +1,9 @@
-import pytesseract
 from google.cloud import vision
 import io
 
+
 class Recognizer:
-    def __init__(self, config=r'--oem 3 --psm 6', language='kor', threshold=70):
-        self.config = config
-        self.language = language
-        self.threshold = threshold
+    def __init__(self):
         self.client = vision.ImageAnnotatorClient()
 
 
