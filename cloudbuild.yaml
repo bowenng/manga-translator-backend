@@ -6,7 +6,7 @@ steps:
   - manga-translate
   - --source=.
   - --trigger-http
-  - --region=us-central1
+  - --region=us-east1
   - --allow-unauthenticated
   - --runtime=python37
   - --entry-point=translate_image
