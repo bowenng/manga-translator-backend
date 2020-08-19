@@ -16,6 +16,8 @@ def translate_image(request):
 
     image = request.files['manga']
 
+    return str(image)
+
     if image:
         translator = MangaTranslator()
         translated_manga = translator.translate(image)
