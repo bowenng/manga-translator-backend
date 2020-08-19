@@ -27,6 +27,7 @@ class Recognizer:
 
         return Blocks.from_ocr_annotations(response.full_text_annotation)
 
+
 class Block:
 
     def __init__(self, text, bounding_box, confidence):
@@ -83,4 +84,7 @@ class Blocks:
             description += f'\t{block}\n'
         description += ']'
         return description
+
+    def __iter__(self):
+        return iter(self.blocks)
 

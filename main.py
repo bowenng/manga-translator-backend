@@ -3,7 +3,7 @@ from MangaTranslator.manga_translator import MangaTranslator
 
 # Press the green button in the gutter to run the script.
 if __name__ == '__main__':
-    MANGA_DIR = "/Users/bryan/Downloads/oops5.jpg"
+    MANGA_DIR = "/Users/bryan/Downloads/oops3.jpg"
     CONFIG = r'--oem 3 --psm 6'
     LANGUAGE = 'kor'
     THRESHOLD = 60
