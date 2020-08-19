@@ -6,3 +6,9 @@ steps:
   - manga-translate
   - --source=.
   - --trigger-http
+  - --region=us-central1
+  - --allow-unauthenticated
+  - --runtime=python37
+  - --entry-point=translate-image
+  - --memory=256
+  - --service-account=mangatranslatoradmin@manga-translator-20200817.iam.gserviceaccount.com
