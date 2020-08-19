@@ -1,4 +1,5 @@
 from MangaTranslator.manga_translator import MangaTranslator
+from google.cloud import error_reporting
 import base64
 import flask
 import io
@@ -14,20 +15,23 @@ def translate_image(request):
        `make_response <http://flask.pocoo.org/docs/1.0/api/#flask.Flask.make_response>`.
     """
 
-    image = request.files['manga']
+    client = error_reporting.Client()
 
-    return str(image)
+    try:
+        image = request.files['manga']
 
-    if image:
-        translator = MangaTranslator()
-        translated_manga = translator.translate(image)
-        encoded_translated_manga = base64.b64encode(translated_manga)
-        response = flask.make_response((encoded_translated_manga, 200, {'Content-Type' : 'image/png'}))
+        if image:
+            translator = MangaTranslator()
+            translated_manga = translator.translate(image)
+            encoded_translated_manga = base64.b64encode(translated_manga)
+            response = flask.make_response((encoded_translated_manga, 200, {'Content-Type' : 'image/png'}))
 
-        return response
-    else:
-        return flask.make_response(('Invalid Argument', 406))
-
+            return response
+        else:
+            return flask.make_response(('Invalid Argument', 406))
+    except Exception:
+        client.report_exception()
+        return flask.make_response(('Error while processing input', 500))
 
 if __name__ == '__main__':
     MANGA_DIR = "/Users/bryan/Downloads/IMG_5600.JPG"
