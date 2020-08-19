@@ -1,4 +1,5 @@
 from MangaTranslator.manga_translator import MangaTranslator
+import base64
 import flask
 import io
 
@@ -18,8 +19,8 @@ def translate_image(request):
     if image:
         translator = MangaTranslator()
         translated_manga = translator.translate(image)
-
-        response = flask.make_response((translated_manga, 200, {'Content-Type' : 'image/png'}))
+        encoded_translated_manga = base64.b64encode(translated_manga)
+        response = flask.make_response((encoded_translated_manga, 200, {'Content-Type' : 'image/png'}))
 
         return response
     else:
