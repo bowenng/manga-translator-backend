@@ -1,8 +1,9 @@
 from MangaTranslator.manga_translator import MangaTranslator
-from google.cloud import error_reporting
+from google.cloud import logging
 import base64
 import flask
 import io
+import traceback
 
 
 def translate_image(request):
@@ -15,7 +16,7 @@ def translate_image(request):
        `make_response <http://flask.pocoo.org/docs/1.0/api/#flask.Flask.make_response>`.
     """
 
-    client = error_reporting.Client()
+    logging_client = logging.Client()
 
     try:
         image = request.files['manga']
@@ -29,9 +30,13 @@ def translate_image(request):
             return response
         else:
             return flask.make_response(('Invalid Argument', 406))
+
     except Exception:
-        client.report_exception()
-        return flask.make_response(('Error while processing input', 500))
+        logger = logging_client.logger("Manga-Translator")
+        stacktrace = traceback.format_exc()
+        logger.log_text(stacktrace)
+        return flask.make_response(('An error has occurred', 500))
+
 
 if __name__ == '__main__':
     MANGA_DIR = "/Users/bryan/Downloads/IMG_5600.JPG"
