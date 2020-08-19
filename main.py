@@ -25,14 +25,14 @@ def translate_image(request):
         return flask.make_response(('Invalid Argument', '406'))
 
 
-if __name__ == '__main__':
-    MANGA_DIR = "/Users/bryan/Downloads/oops3.jpg"
-
-    with io.open(MANGA_DIR, 'rb') as image_file:
-        content = image_file.read()
-
-    mange_translator = MangaTranslator()
-    manga = mange_translator.translate(content)
-
-    with io.open("manga.png", 'wb') as image_out:
-        image_out.write(manga)
+# if __name__ == '__main__':
+#     MANGA_DIR = "/Users/bryan/Downloads/oops3.jpg"
+#
+#     with io.open(MANGA_DIR, 'rb') as image_file:
+#         content = image_file.read()
+#
+#     mange_translator = MangaTranslator()
+#     manga = mange_translator.translate(content)
+#
+#     with io.open("manga.png", 'wb') as image_out:
+#         image_out.write(manga)
