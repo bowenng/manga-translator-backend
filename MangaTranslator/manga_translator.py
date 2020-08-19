@@ -19,7 +19,7 @@ class MangaTranslator:
         self.font_face = cv2.FONT_HERSHEY_SIMPLEX
         self.font_scale = 1
         self.font_thickness = 1
-        self.estimate_character = 'M'
+        self.estimate_character = 's'
         self.text_color = (0, 0, 0)
 
         self.text_background = (255, 255, 255)
@@ -47,6 +47,7 @@ class MangaTranslator:
         return cv2.imdecode(npimg, cv2.IMREAD_COLOR)
 
     def remove_text(self, image, blocks):
+        # TODO: Use background color
         for block in blocks:
             vertices = block.bounding_box.vertices
             start, end = (vertices[0].x, vertices[0].y), (vertices[2].x, vertices[2].y)

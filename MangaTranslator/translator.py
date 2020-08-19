@@ -8,9 +8,12 @@ class Translator:
 
     def translate(self, text, target_language='eng'):
         # TODO: Skip English
+        if text is None or len(text) == 0:
+            return []
+
         translations = self.translate_client.translate(text, target_language=target_language)
 
         if isinstance(text, str):
-            return html.unescape(translations['translatedText'])
+            return [html.unescape(translations['translatedText'])]
         else:
             return [html.unescape(translation['translatedText']) for translation in translations]
