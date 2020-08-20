@@ -58,7 +58,7 @@ class Blocks:
             (1, 1),
             (-1, 1)
         )
-        padding = min(max_width // 100 * 2, max_height // 100 * 2)
+        padding = min(max_width // 100 * 1, max_height // 100 * 1)
         for block in self.blocks:
             vertices = block.bounding_box.vertices
             for i, vertex in enumerate(vertices):

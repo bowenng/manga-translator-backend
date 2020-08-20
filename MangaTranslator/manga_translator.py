@@ -75,13 +75,15 @@ class MangaTranslator:
         """
 
         # TODO: Use background color
+
         for block in blocks:
             vertices = block.bounding_box.vertices
             start, end = (vertices[0].x, vertices[0].y), (vertices[2].x, vertices[2].y)
+            text_background = image[start[1], start[0]].tolist()
             image = cv2.rectangle(image,
                                   start,
                                   end,
-                                  self.text_background,
+                                  text_background,
                                   MangaTranslator.FILL)
         return image
 
