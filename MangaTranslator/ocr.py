@@ -51,6 +51,27 @@ class Blocks:
     def text_list(self):
         return [block.text for block in self.blocks]
 
+    def add_padding(self, max_width, max_height):
+        PADDING_SCALE = (
+            (-1, -1),
+            (1, -1),
+            (1, 1),
+            (-1, 1)
+        )
+        padding = min(max_width // 100 * 2, max_height // 100 * 2)
+        for block in self.blocks:
+            vertices = block.bounding_box.vertices
+            for i, vertex in enumerate(vertices):
+                new_x = vertex.x + PADDING_SCALE[i][0] * padding
+                new_y = vertex.y + PADDING_SCALE[i][0] * padding
+                if 0 <= new_x <= max_width:
+                    vertex.x = new_x
+                if 0 <= new_y <= max_height:
+                    vertex.y = new_y
+
+
+
+
     def __repr__(self):
         description = '[\n'
         for block in self.blocks:

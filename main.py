@@ -32,7 +32,7 @@ def translate_image(request: flask.Request) -> flask.Response:
 
 
 if __name__ == '__main__':
-    MANGA_DIR = "/Users/bryan/Downloads/IMG_5600.JPG"
+    MANGA_DIR = "/Users/bryan/Downloads/oops2.jpg"
 
     with io.open(MANGA_DIR, 'rb') as image_file:
         content = image_file.read()
